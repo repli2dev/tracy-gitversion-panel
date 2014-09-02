@@ -1,0 +1,23 @@
+{
+	"name": “jandrabek/tracy-gitversion-panel",
+	"description": “Tracy DebugBar panel displaying current project git branch.",
+	"keywords": ["nette", "debug", "git", "branch", "log"],
+	"license": ["BSD-3"],
+	"authors": [
+		{
+			"name": "Vojtěch Vondra",
+			"homepage": "http://www.vojtechvondra.cz"
+		},
+		{
+			"name": "Jan Drábek",
+			"homepage": "http://www.jandrabek.cz"
+		}
+	],
+	"require": {
+		"php": ">=5.3.2",
+		"nette/tracy": ">=2.2"
+	},
+	"autoload": {
+		"psr-4": { "JanDrabek\\Tracy\\”: "src/" }
+	}
+}

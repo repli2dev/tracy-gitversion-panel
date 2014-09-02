@@ -1,4 +1,27 @@
-tracy-gitversion-panel
+Git Version Panel
 ======================
 
-Debugger panel for Tracy
+Panel for Tracy debug panel.
+Shows current branch and current revision hash to be able identify your deployed version on sight.
+
+Inspired by https://gist.github.com/vvondra/3645108.
+
+Installing
+----------
+
+Install library via composer:
+
+```
+composer require jandrabek/tracy-gitversion-panel
+```
+
+Register panel
+
+```
+nette:
+    debugger:
+        bar: [JanDrabek\Tracy\GitVersionPanel]
+# Or when you register multiple extensions
+#       bar:
+#           - JanDrabek\Tracy\GitVersionPanel
+```
