@@ -12,38 +12,34 @@ use Tracy\IBarPanel;
 class GitVersionPanel implements IBarPanel
 {
 
+	private $read = false;
+
+	private $branch;
+	private $commit;
+
 	public function getPanel()
 	{
-		return '';
+		$this->parseHead();
+		return '<h1>Git Version</h1><p>Revision: ' . $this->getCurrentCommitHash() . '</p>';
 	}
 
 	protected function getCurrentBranchName()
 	{
-		$scriptPath = $_SERVER['SCRIPT_FILENAME'];
-
-		$dir = realpath(dirname($scriptPath));
-		while ($dir !== false && !is_dir($dir . '/.git')) {
-			flush();
-			$currentDir = $dir;
-			$dir .= '/..';
-			$dir = realpath($dir);
-
-			// Stop recursion to parent on root directory
-			if ($dir == $currentDir) {
-				break;
-			}
+		$this->parseHead();
+		if ($this->branch) {
+			return $this->branch;
+		} elseif ($this->commit) {
+			return 'detached';
 		}
+		return 'not versioned';
+	}
 
-		$head = $dir . '/.git/HEAD';
-		if ($dir && is_readable($head)) {
-			$branch = file_get_contents($head);
-			if (strpos($branch, 'ref:') === 0) {
-				$parts = explode('/', $branch);
-				return $parts[2];
-			}
-			return '(' . substr($branch, 0, 7) . '&hellip;)';
+	protected function getCurrentCommitHash()
+	{
+		$this->parseHead();
+		if ($this->commit) {
+			return $this->commit;
 		}
-
 		return 'not versioned';
 	}
 
@@ -53,4 +49,41 @@ class GitVersionPanel implements IBarPanel
 		. $this->getCurrentBranchName();
 	}
 
+	private function parseHead()
+	{
+		if (!$this->read) {
+			$scriptPath = $_SERVER['SCRIPT_FILENAME'];
+			$dir = realpath(dirname($scriptPath));
+			while ($dir !== false && !is_dir($dir . '/.git')) {
+				flush();
+				$currentDir = $dir;
+				$dir .= '/..';
+				$dir = realpath($dir);
+
+				// Stop recursion to parent on root directory
+				if ($dir == $currentDir) {
+					break;
+				}
+			}
+
+			$head = $dir . '/.git/HEAD';
+			if ($dir && is_readable($head)) {
+				$branch = file_get_contents($head);
+				if (strpos($branch, 'ref:') === 0) {
+					$parts = explode('/', $branch);
+					$this->branch = $parts[2];
+
+					$commitFile = $dir . '/.git/' . trim(substr($branch, 5, strlen($branch)));
+					if (is_readable($commitFile)) {
+						$this->commit = file_get_contents($commitFile);
+					}
+				} else {
+					$this->commit = $branch;
+				}
+			}
+			$this->read = true;
+		}
+	}
+
 }
+
