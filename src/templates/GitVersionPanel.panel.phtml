@@ -4,33 +4,47 @@ namespace JanDrabek\Tracy;
 
 ?>
 
-<h1>Git Version</h1>
-<p>
-<table>
-    <tr>
-        <th>Revision</th>
-        <td><?php echo $this->getCurrentCommitHash(); ?></td>
-    </tr>
-</table>
-</p>
-<p>
-<table>
-    <tr>
-        <th colspan="4">Last logs</th>
-    </tr>
-    <tr>
-        <th>From</th>
-        <th>To</th>
-        <th>User & time</th>
-        <th>Action</th>
-    </tr>
-    <?php foreach ($this->getLogTail() as $row) { ?>
+<style class="tracy-debug">
+
+    #tracy-debug .nette-ContainerPanel .tracy-inner {
+        width: 700px;
+    }
+
+    #tracy-debug .nette-ContainerPanel table {
+        width: 100%;
+        white-space: nowrap;
+    }
+
+</style>
+
+<div class="nette-ContainerPanel">
+    <h1>Git Version</h1>
+
+    <h2>Actual state</h2>
+    <table>
         <tr>
-            <td><?php echo $row['from']; ?></td>
-            <td><?php echo $row['to']; ?></td>
-            <td><?php echo $row['user']; ?></td>
-            <td><?php echo $row['action']; ?></td>
+            <th>Revision</th>
+            <td><?php echo $this->getCurrentCommitHash(); ?></td>
         </tr>
-    <?php } ?>
-</table>
-</p>
+    </table>
+
+    <h2>Last logs</h2>
+    <div class="tracy-inner">
+        <table>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>User & time</th>
+                <th>Action</th>
+            </tr>
+					<?php foreach ($this->getLogTail() as $row) { ?>
+              <tr>
+                  <td><?php echo $row['from']; ?></td>
+                  <td><?php echo $row['to']; ?></td>
+                  <td><?php echo $row['user']; ?></td>
+                  <td><?php echo $row['action']; ?></td>
+              </tr>
+					<?php } ?>
+        </table>
+    </div>
+</div>
