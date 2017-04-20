@@ -109,7 +109,7 @@ class GitVersionPanel implements IBarPanel
             if ($dir && is_readable($head)) {
                 $branch = file_get_contents($head);
                 if (strpos($branch, 'ref:') === 0) {
-                    $parts = explode('/', $branch);
+                    $parts = explode('/', $branch, 3);
                     $this->branch = $parts[2];
 
                     $commitFile = $dir . '/' . trim(substr($branch, 5, strlen($branch)));
