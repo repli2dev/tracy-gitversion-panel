@@ -46,7 +46,14 @@ class GitVersionPanel implements IBarPanel
                 $rowCounter++;
             fseek($fp, $pos--);
         }
-        return explode("\n",trim($log));
+        $result = [];
+        foreach (explode("\n",trim($log)) as $row){
+            $input = [];
+            list($row, $input['action']) = explode("\t", $row, 2);
+            list($input['from'],$input['to'], $input['user']) = explode(" ", $row,3);
+            $result[] = $input;
+        }
+        return $result;
     }
 
     protected function getCurrentBranchName()

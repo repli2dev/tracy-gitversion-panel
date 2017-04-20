@@ -5,19 +5,32 @@ namespace JanDrabek\Tracy;
 ?>
 
 <h1>Git Version</h1>
+<p>
 <table>
     <tr>
         <th>Revision</th>
-    </tr>
-    <tr>
         <td><?php echo $this->getCurrentCommitHash(); ?></td>
     </tr>
+</table>
+</p>
+<p>
+<table>
     <tr>
-        <th>Last logs</th>
+        <th colspan="4">Last logs</th>
     </tr>
-    <?php foreach ($this->getLogTail() as $row){ ?>
+    <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>User & time</th>
+        <th>Action</th>
+    </tr>
+    <?php foreach ($this->getLogTail() as $row) { ?>
         <tr>
-            <td><?php echo $row; ?></td>
+            <td><?php echo $row['from']; ?></td>
+            <td><?php echo $row['to']; ?></td>
+            <td><?php echo $row['user']; ?></td>
+            <td><?php echo $row['action']; ?></td>
         </tr>
     <?php } ?>
 </table>
+</p>
