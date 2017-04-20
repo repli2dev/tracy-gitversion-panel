@@ -1,13 +1,23 @@
 <?php
 
-namespace Stopka\Tracy\GitVersion;
+namespace JanDrabek\Tracy;
 
 ?>
 
 <h1>Git Version</h1>
-<p>Revision: '<?php echo $this->getCurrentCommitHash(); ?>'</p>
-<p>Log: <br />
+<table>
+    <tr>
+        <th>Revision</th>
+    </tr>
+    <tr>
+        <td><?php echo $this->getCurrentCommitHash(); ?></td>
+    </tr>
+    <tr>
+        <th>Last logs</th>
+    </tr>
     <?php foreach ($this->getLogTail() as $row){ ?>
-        <div><?php echo $row; ?></div>
+        <tr>
+            <td><?php echo $row; ?></td>
+        </tr>
     <?php } ?>
-</p>
+</table>

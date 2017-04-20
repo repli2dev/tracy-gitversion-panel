@@ -38,8 +38,8 @@ class GitVersionPanel implements IBarPanel
         fseek($fp, -1, SEEK_END);
         $pos = ftell($fp);
         $log = "";
-        $rowCounter = 0;
-        while($rowCounter >= $rowCount) {
+        $rowCounter = -1;
+        while($rowCounter <= $rowCount && $pos >= 0) {
             $char = fgetc($fp);
             $log = $char.$log;
             if($char == "\n")
