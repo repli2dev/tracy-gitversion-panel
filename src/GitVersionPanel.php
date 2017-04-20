@@ -12,81 +12,117 @@ use Tracy\IBarPanel;
 class GitVersionPanel implements IBarPanel
 {
 
-	private $read = false;
+    private $read = false;
 
-	private $branch;
-	private $commit;
+    private $dir;
 
-	public function getPanel()
-	{
+    private $branch;
+    private $commit;
+
+    public function getPanel()
+    {
         $this->parseHead();
         ob_start(function () {});
-        require __DIR__ . '/templates/MaintenancePanel.panel.phtml';
+        require __DIR__ . '/templates/GitVersionPanel.panel.phtml';
         return ob_get_clean();
-	}
+    }
 
-	protected function getCurrentBranchName()
-	{
-		$this->parseHead();
-		if ($this->branch) {
-			return $this->branch;
-		} elseif ($this->commit) {
-			return 'detached';
-		}
-		return 'not versioned';
-	}
+    protected function getLogTail($rowCount=5)
+    {
+        $dir = $this->findGitDir();
+        $logHead = $dir.'/logs/HEAD';
+        if(!$dir || !is_readable($logHead)){
+            return [];
+        }
+        $fp = fopen($logHead,'r');
+        fseek($fp, -1, SEEK_END);
+        $pos = ftell($fp);
+        $log = "";
+        $rowCounter = 0;
+        while($rowCounter >= $rowCount) {
+            $char = fgetc($fp);
+            $log = $char.$log;
+            if($char == "\n")
+                $rowCounter++;
+            fseek($fp, $pos--);
+        }
+        return explode("\n",trim($log));
+    }
 
-	protected function getCurrentCommitHash()
-	{
-		$this->parseHead();
-		if ($this->commit) {
-			return $this->commit;
-		}
-		return 'not versioned';
-	}
+    protected function getCurrentBranchName()
+    {
+        $this->parseHead();
+        if ($this->branch) {
+            return $this->branch;
+        } elseif ($this->commit) {
+            return 'detached';
+        }
+        return 'not versioned';
+    }
 
-	public function getTab()
-	{
+    protected function getCurrentCommitHash()
+    {
+        $this->parseHead();
+        if ($this->commit) {
+            return $this->commit;
+        }
+        return 'not versioned';
+    }
+
+    public function getTab()
+    {
         ob_start(function () {});
-        require __DIR__ . '/templates/MaintenancePanel.tab.phtml';
+        require __DIR__ . '/templates/GitVersionPanel.tab.phtml';
         return ob_get_clean();
-	}
+    }
 
-	private function parseHead()
-	{
-		if (!$this->read) {
-			$scriptPath = $_SERVER['SCRIPT_FILENAME'];
-			$dir = realpath(dirname($scriptPath));
-			while ($dir !== false && !is_dir($dir . '/.git')) {
-				flush();
-				$currentDir = $dir;
-				$dir .= '/..';
-				$dir = realpath($dir);
+    private function findGitDir(){
+        if($this->dir)
+            return $this->dir;
 
-				// Stop recursion to parent on root directory
-				if ($dir == $currentDir) {
-					break;
-				}
-			}
+        $scriptPath = $_SERVER['SCRIPT_FILENAME'];
+        $dir = realpath(dirname($scriptPath));
+        while ($dir !== false) {
+            flush();
+            $currentDir = $dir;
+            $dir .= '/..';
+            $dir = realpath($dir);
+            $gitDir = $dir . '/.git';
+            if(is_dir($gitDir)){
+                $this->dir = $gitDir;
+                return $gitDir;
+            }
+            // Stop recursion to parent on root directory
+            if ($dir == $currentDir) {
+                break;
+            }
+        }
+        return NULL;
+    }
 
-			$head = $dir . '/.git/HEAD';
-			if ($dir && is_readable($head)) {
-				$branch = file_get_contents($head);
-				if (strpos($branch, 'ref:') === 0) {
-					$parts = explode('/', $branch);
-					$this->branch = $parts[2];
+    private function parseHead()
+    {
+        if (!$this->read) {
+            $dir = $this->findGitDir();
 
-					$commitFile = $dir . '/.git/' . trim(substr($branch, 5, strlen($branch)));
-					if (is_readable($commitFile)) {
-						$this->commit = file_get_contents($commitFile);
-					}
-				} else {
-					$this->commit = $branch;
-				}
-			}
-			$this->read = true;
-		}
-	}
+            $head = $dir . '/HEAD';
+            if ($dir && is_readable($head)) {
+                $branch = file_get_contents($head);
+                if (strpos($branch, 'ref:') === 0) {
+                    $parts = explode('/', $branch);
+                    $this->branch = $parts[2];
+
+                    $commitFile = $dir . '/' . trim(substr($branch, 5, strlen($branch)));
+                    if (is_readable($commitFile)) {
+                        $this->commit = file_get_contents($commitFile);
+                    }
+                } else {
+                    $this->commit = $branch;
+                }
+            }
+            $this->read = true;
+        }
+    }
 
 }
 

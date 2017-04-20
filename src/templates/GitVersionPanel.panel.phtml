@@ -1,0 +1,13 @@
+<?php
+
+namespace Stopka\Tracy\GitVersion;
+
+?>
+
+<h1>Git Version</h1>
+<p>Revision: '<?php echo $this->getCurrentCommitHash(); ?>'</p>
+<p>Log: <br />
+    <?php foreach ($this->getLogTail() as $row){ ?>
+        <div><?php echo $row; ?></div>
+    <?php } ?>
+</p>
