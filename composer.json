@@ -11,6 +11,10 @@
 		{
 			"name": "Jan Drábek",
 			"homepage": "http://www.jandrabek.cz"
+		},
+		{
+			"name": "Štěpán Škorpil",
+			"homepage": "http://www.skorpils.cz"
 		}
 	],
 	"require": {
